@@ -12,6 +12,7 @@ export default function UtilitiesServicesPage() {
     <>
       <InnerBanner
         title={d.title}
+        backgroundImage="/images/food2.jpg"
         subtitle={d.intro}
         breadcrumbs={[
           { href: "/", label: "Home" },

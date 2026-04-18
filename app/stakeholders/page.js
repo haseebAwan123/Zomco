@@ -10,6 +10,7 @@ export default function StakeholdersPage() {
     <>
       <InnerBanner
         title="Stakeholders"
+        backgroundImage="/images/banner4.jpg"
         subtitle="Organizations we are proud to support — logos shown as stylized placeholders for this demo build."
         breadcrumbs={[
           { href: "/", label: "Home" },

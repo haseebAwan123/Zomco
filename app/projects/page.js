@@ -11,6 +11,7 @@ export default function ProjectsPage() {
     <>
       <InnerBanner
         title="Projects"
+        backgroundImage="/images/banner1.jpg"
         subtitle="A sample of representative engagements across industrial, utilities, catering, and facility programs."
         breadcrumbs={[
           { href: "/", label: "Home" },

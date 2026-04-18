@@ -10,6 +10,7 @@ export default function CertificationsPage() {
     <>
       <InnerBanner
         title="Certifications"
+        backgroundImage="/images/banner2.jpg"
         subtitle="Management systems and client approvals that underpin how we mobilize teams and manage risk."
         breadcrumbs={[
           { href: "/", label: "Home" },

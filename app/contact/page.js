@@ -11,6 +11,7 @@ export default function ContactPage() {
     <>
       <InnerBanner
         title="Contact us"
+        backgroundImage="/images/camping.jpg"
         subtitle="Reach the ZOMCO team for new opportunities, partnerships, or media inquiries."
         breadcrumbs={[
           { href: "/", label: "Home" },

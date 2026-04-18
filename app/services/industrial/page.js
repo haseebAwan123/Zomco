@@ -12,6 +12,7 @@ export default function IndustrialServicesPage() {
     <>
       <InnerBanner
         title={d.title}
+        backgroundImage="/images/banner5.jpg"
         subtitle={d.intro}
         breadcrumbs={[
           { href: "/", label: "Home" },

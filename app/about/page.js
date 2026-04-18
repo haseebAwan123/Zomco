@@ -10,6 +10,7 @@ export default function AboutPage() {
     <>
       <InnerBanner
         title="About ZOMCO"
+        backgroundImage="/images/banner3.jpg"
         subtitle={`${company.legalName} — ${company.tagline}`}
         breadcrumbs={[
           { href: "/", label: "Home" },

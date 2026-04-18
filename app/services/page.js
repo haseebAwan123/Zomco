@@ -11,6 +11,7 @@ export default function ServicesPage() {
     <>
       <InnerBanner
         title="Services"
+        backgroundImage="/images/food.jpg"
         subtitle="Industrial, utilities, catering & camps, and integrated facility management — delivered with consistent governance and measurable KPIs."
         breadcrumbs={[
           { href: "/", label: "Home" },

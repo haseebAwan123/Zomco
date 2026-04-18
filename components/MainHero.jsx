@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { company } from "@/lib/content";
+import { Fragment, useEffect, useState } from "react";
 
 const highlights = [
   "Industrial services",
@@ -8,26 +11,105 @@ const highlights = [
   "Facility management",
 ];
 
+/** Time between slide changes (ms) */
+const AUTO_SLIDE_MS = 4000;
+/** Crossfade duration — keep comfortably below AUTO_SLIDE_MS */
+const FADE_MS = 900;
+
 export default function MainHero() {
+  const [slides, setSlides] = useState([]);
+  const [active, setActive] = useState(0);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(mq.matches);
+    const id = requestAnimationFrame(sync);
+    mq.addEventListener("change", sync);
+    return () => {
+      cancelAnimationFrame(id);
+      mq.removeEventListener("change", sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/banners", { cache: "no-store" });
+        if (!res.ok) throw new Error("banners");
+        const data = await res.json();
+        const list = Array.isArray(data.images) ? data.images : [];
+        if (!cancelled) setSlides(list);
+      } catch {
+        if (!cancelled) setSlides([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (slides.length <= 1 || reduceMotion) return undefined;
+    const id = window.setInterval(() => {
+      setActive((i) => (i + 1) % slides.length);
+    }, AUTO_SLIDE_MS);
+    return () => window.clearInterval(id);
+  }, [slides.length, reduceMotion]);
+
+  // Warm the next frame to reduce decode pop-in
+  useEffect(() => {
+    if (slides.length === 0) return;
+    const next = slides[(active + 1) % slides.length];
+    const img = new window.Image();
+    img.decoding = "async";
+    img.src = next;
+  }, [active, slides]);
+
   return (
     <section
-      className="relative isolate overflow-hidden bg-slate-900"
+      className="relative isolate flex min-h-[min(88vh,56rem)] flex-col overflow-hidden bg-slate-900"
       aria-labelledby="hero-heading"
     >
-      {/* Background pattern */}
+      {/* Full-bleed image slider — fixed stacking; opacity crossfade avoids layout shift */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.12]"
-        style={{
-          backgroundImage:
-            "linear-gradient(90deg, white 1px, transparent 1px), linear-gradient(white 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-        aria-hidden
-      />
-      <div className="pointer-events-none absolute -right-32 -top-24 h-96 w-96 rounded-full bg-sky-500/25 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-40 -left-20 h-96 w-96 rounded-full bg-amber-400/15 blur-3xl" />
+        className="pointer-events-none absolute inset-0 z-0 bg-slate-900"
+        aria-hidden="true"
+      >
+        {slides.length === 0 ? null : (
+          <div className="absolute inset-0">
+            {slides.map((src, i) => (
+              <Fragment key={src}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- opacity-stack slider */}
+                <img
+                  src={src}
+                  alt=""
+                  decoding="async"
+                  fetchPriority={i === 0 ? "high" : "low"}
+                  className={[
+                    "absolute inset-0 h-full w-full object-cover",
+                    "ease-in-out will-change-[opacity]",
+                    i === active ? "z-[1] opacity-100" : "z-0 opacity-0",
+                  ].join(" ")}
+                  style={{
+                    transitionProperty: "opacity",
+                    transitionDuration: `${FADE_MS}ms`,
+                  }}
+                />
+              </Fragment>
+            ))}
+          </div>
+        )}
+      </div>
 
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-center lg:gap-16 lg:px-8 lg:py-24">
+      {/* Dark overlay for headline contrast (~55%) */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[2] bg-black/55"
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-center lg:gap-16 lg:px-8 lg:py-24">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-300/90">
             {company.legalName}
